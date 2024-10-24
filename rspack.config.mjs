@@ -2,6 +2,7 @@ import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { defineConfig } from '@rspack/cli';
 import { rspack } from '@rspack/core';
+import ForkTsCheckerWebpackPlugin from 'fork-ts-checker-webpack-plugin';
 import RefreshPlugin from '@rspack/plugin-react-refresh';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -11,13 +12,10 @@ const isDev = process.env.NODE_ENV === 'development';
 // Target browsers, see: https://github.com/browserslist/browserslist
 const targets = ['chrome >= 87', 'edge >= 88', 'firefox >= 78', 'safari >= 14'];
 
-console.log(__dirname);
-console.log(resolve(__dirname, 'src'));
-
 export default defineConfig({
   context: __dirname,
   entry: {
-    main: './src/main.jsx',
+    main: './src/main.tsx',
   },
   resolve: {
     modules: [resolve(__dirname, 'src'), 'node_modules'],
@@ -82,6 +80,7 @@ export default defineConfig({
     ],
   },
   plugins: [
+    new ForkTsCheckerWebpackPlugin(),
     new rspack.HtmlRspackPlugin({
       template: './index.html',
     }),
@@ -90,9 +89,10 @@ export default defineConfig({
   optimization: {
     minimizer: [
       new rspack.SwcJsMinimizerRspackPlugin(),
-      new rspack.LightningCssMinimizerRspackPlugin({
-        minimizerOptions: { targets },
-      }),
+      isDev &&
+        new rspack.LightningCssMinimizerRspackPlugin({
+          minimizerOptions: { targets },
+        }),
     ],
   },
   // resolve: {
@@ -100,5 +100,11 @@ export default defineConfig({
   // },
   experiments: {
     css: true,
+  },
+  devServer: {
+    historyApiFallback: true,
+  },
+  output: {
+    publicPath: '/',
   },
 });
