@@ -1,10 +1,10 @@
 import React from 'react';
 import { Space, Table, Tag } from 'antd';
 import type { TableProps } from 'antd';
-import { Link } from 'react-router-dom';
+import { Link, Outlet } from 'react-router-dom';
 
 interface DataType {
-  key: string;
+  key: number;
   name: string;
   age: number;
   address: string;
@@ -54,37 +54,40 @@ const columns: TableProps<DataType>['columns'] = [
     render: (_, r) => (
       <Space size="middle">
         <Link to={`/feature/table/${r.key}`}>details</Link>
+        <Link to={`/feature/table/${r.key}/edit`}>edit</Link>
       </Space>
     ),
   },
 ];
 
-const data: DataType[] = [
-  {
-    key: '1',
+const data: DataType[] = Array(100)
+  .fill(2)
+  .map((_, key) => ({
+    key: key,
     name: 'John Brown',
-    age: 32,
+    age: Math.random(),
     address: 'New York No. 1 Lake Park',
     tags: ['nice', 'developer'],
-  },
-  {
-    key: '2',
-    name: 'Jim Green',
-    age: 42,
-    address: 'London No. 1 Lake Park',
-    tags: ['loser'],
-  },
-  {
-    key: '3',
-    name: 'Joe Black',
-    age: 32,
-    address: 'Sydney No. 1 Lake Park',
-    tags: ['cool', 'teacher'],
-  },
-];
+  }));
 
 const TablePage: React.FC = () => (
   <Table<DataType> columns={columns} dataSource={data} />
 );
 
-export default TablePage;
+function Index() {
+  return (
+    <div
+      style={{
+        height: '100vh',
+        width: '100%',
+        overflow: 'hidden',
+        position: 'relative',
+      }}
+    >
+      <TablePage />
+      <Outlet />
+    </div>
+  );
+}
+
+export default Index;
